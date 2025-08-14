@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { CartItem, MenuItem } from '../types';
 
 interface CartContextType {
@@ -27,20 +27,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addToCart = (menuItem: MenuItem) => {
     setItems(prev => {
-      const existingItem = prev.find(item => item.id === menuItem.id);
+      const existingItem = prev.find(item => item._id === menuItem._id);
       if (existingItem) {
         return prev.map(item =>
-          item.id === menuItem.id
+          item._id === menuItem._id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
-      return [...prev, { id: menuItem.id, quantity: 1, menuItem }];
+      return [...prev, { _id: menuItem._id, quantity: 1, menuItem }];
     });
   };
 
   const removeFromCart = (id: string) => {
-    setItems(prev => prev.filter(item => item.id !== id));
+    setItems(prev => prev.filter(item => item._id !== id));
   };
 
   const updateQuantity = (id: string, quantity: number) => {
@@ -50,7 +50,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setItems(prev =>
       prev.map(item =>
-        item.id === id ? { ...item, quantity } : item
+        item._id === id ? { ...item, quantity } : item
       )
     );
   };

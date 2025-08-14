@@ -1,13 +1,7 @@
 export interface MenuItem {
-  id: string;
-  name: {
-    en: string;
-    am: string;
-  };
-  description: {
-    en: string;
-    am: string;
-  };
+  _id: string;
+  name: string;
+  description: string;
   price: number;
   category: 'appetizers' | 'main-courses' | 'desserts' | 'drinks';
   ingredients: {
@@ -15,11 +9,12 @@ export interface MenuItem {
     am: string[];
   };
   image: string;
-  available: boolean;
+  isAvailable: boolean;
+  imageUrl:string
 }
 
 export interface CartItem {
-  id: string;
+_id: string;
   quantity: number;
   menuItem: MenuItem;
 }

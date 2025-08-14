@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -19,7 +19,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const mapRef = useRef(null);
+  // const mapRef = useRef(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
@@ -64,12 +64,12 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
               <div className="space-y-4">
                 {items.map((item) => (
                   <div
-                    key={item.id}
+                    key={item._id}
                     className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4"
                   >
                     <div className="flex items-center space-x-4">
                       <img
-                        src={item.menuItem.image}
+                        src={item.menuItem.imageUrl}
                         alt={item.menuItem.name[language]}
                         className="w-16 h-16 object-cover rounded-lg"
                       />
@@ -83,7 +83,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                       </div>
                       <div className="flex items-center space-x-2">
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={() => updateQuantity(item._id, item.quantity - 1)}
                           className="p-1 rounded bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
                         >
                           <Minus className="w-4 h-4" />
@@ -92,13 +92,13 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                           {item.quantity}
                         </span>
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          onClick={() => updateQuantity(item._id, item.quantity + 1)}
                           className="p-1 rounded bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
                         >
                           <Plus className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => removeFromCart(item.id)}
+                          onClick={() => removeFromCart(item._id)}
                           className="p-1 rounded text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
