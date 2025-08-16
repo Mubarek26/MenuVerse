@@ -4,10 +4,10 @@ export interface MenuItem {
   description: string;
   price: number;
   category: 'appetizers' | 'main-courses' | 'desserts' | 'drinks';
-  ingredients: {
-    en: string[];
-    am: string[];
-  };
+  // ingredients: {
+  //   en: string[];
+  //   am: string[];
+  // };
   image: string;
   isAvailable: boolean;
   imageUrl:string

@@ -5,7 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { ServiceType } from '../types';
 
 const OrderForm: React.FC = () => {
-  const { serviceType, tableNumber, phoneNumber, setServiceType, setTableNumber, setPhoneNumber } = useOrder();
+  const { serviceType, tableNumber, phoneNumber, setServiceType, setTableNumber, setPhoneNumber, specialInstructions, setSpecialInstructions } = useOrder();
   const { t } = useLanguage();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -168,6 +168,20 @@ const OrderForm: React.FC = () => {
         {errors.phoneNumber && (
           <p className="mt-1 text-sm text-red-600">{errors.phoneNumber}</p>
         )}
+      </div>
+
+      {/* Note / Special Instructions */}
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          {t('specialInstructions') || 'Special Instructions'}
+        </label>
+        <textarea
+          value={specialInstructions || ''}
+          onChange={e => setSpecialInstructions(e.target.value)}
+          className="w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500 border-gray-200 dark:border-gray-600"
+          placeholder={t('specialInstructionsPlaceholder') || 'Add any notes or instructions for your order'}
+          rows={3}
+        />
       </div>
 
       {/* Validation function for external use */}
