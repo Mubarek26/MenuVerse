@@ -58,14 +58,15 @@ const OrderSummary: React.FC = () => {
 
           {/* Dine-In Table Dropdown */}
           {serviceType === "Dine-In" && (
-            <div className="mb-4">
-              <label className="block mb-1 font-medium">Table Number</label>
+            <div className="mb-4"  >
+              <label  className="block mb-1 font-medium">Table Number</label>
               <select
+                required
                 className="w-full border rounded px-2 py-1"
                 value={tableNumber}
                 onChange={(e) => setTableNumber(Number(e.target.value))}
               >
-                <option value="">Select table</option>
+                <option   value="">Select table</option>
                 {tableNumbers.map((num) => (
                   <option key={num} value={num}>
                     {num}
