@@ -99,6 +99,7 @@ const AppContent: React.FC = () => {
                 <p className="text-gray-500 dark:text-gray-400 text-lg">
                   {t("noResults")}
                 </p>
+
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3  gap-6">
@@ -116,7 +117,6 @@ const AppContent: React.FC = () => {
           </div>
         </div>
       </main>
-
       <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       <Footer />
     </div>
