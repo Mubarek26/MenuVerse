@@ -48,9 +48,9 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
       // totalPrice:total,
       orderType: serviceType,
       tableNumber,
-      phoneNumber:phone,
+      phoneNumber: phone,
       location,
-      notes:specialInstructions,
+      notes: specialInstructions,
     };
     try {
       setIsLoading(true);
@@ -66,12 +66,9 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
       // console.log("Order confirmed:", data);
       setIsLoading(false);
       setShowConfirmation(true);
-      
-     
     } catch (error) {
       console.error("Error confirming order:", error);
     }
-    
   };
 
   useEffect(() => {
@@ -102,7 +99,14 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
         className="absolute inset-0 bg-black bg-opacity-50"
         onClick={onClose}
       />
-      <div className="absolute right-0 top-0 h-full w-full max-w-md bg-white dark:bg-gray-800 shadow-xl">
+      <div
+        style={{
+          // For mobile: slide up from bottom
+          // For desktop/tablet: slide in from right
+          willChange: "transform",
+        }}
+        className="absolute  transition-transform duration-300 right-0 top-0 h-full w-full max-w-md bg-white dark:bg-gray-800 shadow-xl"
+      >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -177,23 +181,22 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                     </div>
                   </div>
                 ))}
+                <div className="border-t border-gray-200 dark:border-gray-700 p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {t("Total Price")}:
+                    </span>
+                    <span className="text-xl font-bold text-teal-600 dark:text-teal-400">
+                      {total} {t("currency")}
+                    </span>
+                  </div>
+                  {/* Order details below subtotal */}
+                  {/* <ServiceTypeAndDetails /> */}
+                </div>
               </div>
             )}
           </div>
-          {items.length > 0 && (
-            <div className="border-t border-gray-200 dark:border-gray-700 p-6">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {t("subtotal")}:
-                </span>
-                <span className="text-xl font-bold text-teal-600 dark:text-teal-400">
-                  {total} {t("currency")}
-                </span>
-              </div>
-              {/* Order details below subtotal */}
-              {/* <ServiceTypeAndDetails /> */}
-            </div>
-          )}
+
           {items.length > 0 && (
             <>
               {!showOrderDetails ? (
@@ -206,14 +209,24 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
               ) : (
                 <div className="mt-6 relative bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 overflow-y-auto max-h-[80vh]">
                   <button
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 bg-transparent border-none"
+                    className="absolute text-gray-600 dark:text-gray-300 p-1 rounded-xl 
+  hover:bg-white/20 dark:hover:bg-white/10 
+  backdrop-blur-sm
+  transition-all duration-200 ease-in-out
+  top-6 right-6 text-3xl font-bold z-10 bg-transparent border-none"
                     onClick={() => setShowOrderDetails(false)}
                     title="Close"
                     style={{ lineHeight: 1 }}
                   >
                     &times;
                   </button>
-                  <div className="flex gap-3 mb-4 justify-center">
+                  {/* <button
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            </button> */}
+                  <div className="flex gap-3 mb-4 justify-start">
                     {["Dine-In", "Takeaway", "Delivery"].map((type) => (
                       <button
                         key={type}
@@ -309,39 +322,39 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                     onClick={() => handleConfirmOrder()}
                   >
                     Confirm Order
-                    </button>
-                    {isLoading && (
-                      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                        <ClipLoader color="#ffffff" size={50} />
+                  </button>
+                  {isLoading && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                      <ClipLoader color="#ffffff" size={50} />
+                    </div>
+                  )}
+                  {showConfirmation && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl p-8 max-w-sm w-full text-center">
+                        <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+                          Order Placed!
+                        </h2>
+                        <p className="mb-6 text-gray-700 dark:text-gray-300">
+                          Your order has been successfully submitted. Thank you!
+                        </p>
+                        <button
+                          className="px-6 py-2 bg-orange-500 text-white rounded-lg font-semibold shadow hover:bg-orange-600 transition-all"
+                          onClick={() => {
+                            setShowConfirmation(false);
+                            setShowOrderDetails(false);
+                            clearCart(); // Clear the cart after order confirmation
+                            onClose();
+                          }}
+                        >
+                          Close
+                        </button>
                       </div>
-                    )}
-                    {showConfirmation && (
-                      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl p-8 max-w-sm w-full text-center">
-                          <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
-                            Order Placed!
-                          </h2>
-                          <p className="mb-6 text-gray-700 dark:text-gray-300">
-                            Your order has been successfully submitted. Thank you!
-                          </p>
-                          <button
-                            className="px-6 py-2 bg-orange-500 text-white rounded-lg font-semibold shadow hover:bg-orange-600 transition-all"
-                            onClick={() => {
-                              setShowConfirmation(false);
-                              setShowOrderDetails(false);
-                              clearCart(); // Clear the cart after order confirmation
-                              onClose();
-                            }}
-                          >
-                            Close
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>
