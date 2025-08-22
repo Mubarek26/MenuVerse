@@ -41,15 +41,20 @@ const AppContent: React.FC = () => {
     async function fetchData() {
       try {
         setIsLoading(true);
+        console.log("Fetching menu data from API...");
         const response = await fetch(`${apiUrl}/menu`, {
           method: "GET",
         });
         if (!response.ok) throw new Error("Network response was not ok");
         const data = await response.json();
         setMenuDataState(data.data?.menuItems || []);
+        console.log("the data is fetched", data);
         setIsLoading(false);
       } catch (error) {
         console.error("Error in MenuItem component:", error);
+      }
+      finally {
+        setIsLoading(false);
       }
     }
     fetchData();
@@ -102,7 +107,7 @@ const AppContent: React.FC = () => {
 
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3  gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-4  gap-6">
                 {filteredItems.map((item) => (
                   <MenuItem key={item._id} item={item}  />
                 ))}

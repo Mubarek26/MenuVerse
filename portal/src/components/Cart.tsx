@@ -213,7 +213,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
   hover:bg-white/20 dark:hover:bg-white/10 
   backdrop-blur-sm
   transition-all duration-200 ease-in-out
-  top-6 right-6 text-3xl font-bold z-10 bg-transparent border-none"
+  top-6 right-5 text-3xl font-bold z-10 bg-transparent border-none"
                     onClick={() => setShowOrderDetails(false)}
                     title="Close"
                     style={{ lineHeight: 1 }}
@@ -230,7 +230,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                     {["Dine-In", "Takeaway", "Delivery"].map((type) => (
                       <button
                         key={type}
-                        className={`px-5 py-2 rounded-full font-semibold border transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 text-base ${
+                        className={`px-3 py-1 rounded-full font-semibold border transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 text-base ${
                           serviceType === type
                             ? "bg-gradient-to-r from-orange-500 to-teal-500 text-white border-orange-500 scale-105"
                             : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
