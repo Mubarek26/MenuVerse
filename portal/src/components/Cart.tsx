@@ -21,10 +21,11 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+ 
+  // const mapRef = useRef(null);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
     null
   );
-  // const mapRef = useRef(null);
   const [userLocation, setUserLocation] = useState<{
     lat: number;
     lng: number;
@@ -36,7 +37,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
     if (!serviceType) return false;
     if (serviceType === "Dine-In" && !tableNumber) return false;
     if (!phone) return false;
-    if (serviceType === "Delivery" && !location) return false;
+    if (serviceType === "Delivery" && !userLocation ||!location) return false;
     return true;
   };
 
@@ -79,17 +80,13 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
           });
-          if (!location)
-            setLocation({
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-            });
+        
         },
         () => {},
         { enableHighAccuracy: true }
       );
     }
-  }, [serviceType, location]);
+  }, [serviceType]);
 
   if (!isOpen) return null;
 
@@ -293,9 +290,9 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                         Delivery Location
                       </label>
                       <DeliveryLocationMap
+                        userLocation={userLocation}
                         location={location}
                         setLocation={setLocation}
-                        userLocation={userLocation}
                       />
                     </div>
                   )}
