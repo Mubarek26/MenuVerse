@@ -1,7 +1,7 @@
-import React, { useRef,useState } from 'react';
+import React, { useState } from 'react';
 import { MapContainer,useMap, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import L, { LeafletMouseEvent, Map as LeafletMap } from 'leaflet';
+import L, { LeafletMouseEvent } from 'leaflet';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -56,12 +56,13 @@ function LocationMarker({ setLocation, location, userLocation, recenter, setRece
 }
 
 const DeliveryLocationMap: React.FC<DeliveryLocationMapProps> = ({ location, setLocation, userLocation }) => {
-  const mapRef = useRef<LeafletMap | null>(null);
+  // const mapRef = useRef<LeafletMap | null>(null);
   const [recenter, setRecenter] = useState(false);
 
   return (
   <div className="h-64 w-full rounded-lg overflow-hidden border z-50 border-gray-300 relative">
       <MapContainer
+     
         center={
           location
             ? [location.lat, location.lng]
@@ -71,9 +72,9 @@ const DeliveryLocationMap: React.FC<DeliveryLocationMapProps> = ({ location, set
         }
         zoom={13}
         style={{ height: '100%', width: '100%' }}
-       whenReady={(event) => {
-    mapRef.current = event.target; // this is the Leaflet map instance
-  }}
+  //      whenReady={(event) => {
+  //   mapRef.current = event.target; // this is the Leaflet map instance
+  // }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
