@@ -11,6 +11,11 @@ export interface MenuItem {
   image: string;
   isAvailable: boolean;
   imageUrl:string
+  // Optional UI and meta fields
+  isNew?: boolean;
+  isHot?: boolean;
+  discount?: number;
+  calories?: number;
 }
 
 export interface CartItem {

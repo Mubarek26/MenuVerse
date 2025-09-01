@@ -53,7 +53,10 @@ const Header: React.FC<HeaderProps> = ({ onCartToggle }) => {
 
             <button
               onClick={onCartToggle}
-              className="relative p-2 rounded-lg bg-teal-100 dark:bg-teal-900 hover:bg-teal-200 dark:hover:bg-teal-800 transition-colors"
+              className={`relative p-2 rounded-lg bg-gradient-to-br from-teal-100 to-transparent dark:from-teal-900/30 hover:scale-105 transform transition-all ${
+                itemCount > 0 ? 'animate-pulse-slow' : ''
+              }`}
+              aria-label="Toggle cart"
             >
               <ShoppingCart className="w-5 h-5 text-teal-700 dark:text-teal-300" />
               {itemCount > 0 && (

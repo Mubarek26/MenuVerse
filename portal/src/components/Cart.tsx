@@ -3,6 +3,7 @@ import { X, Plus, Minus, Trash2 } from "lucide-react";
 import { useCart } from "../contexts/CartContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import DeliveryLocationMap from "./DeliveryLocationMap";
+import OrderProgress from "./OrderProgress";
 const apiUrl = import.meta.env.VITE_API_BASE_URL;
 import { ClipLoader } from "react-spinners";
 interface CartProps {
@@ -20,6 +21,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
 
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [step, setStep] = useState<'cart' | 'payment' | 'success'>('cart');
   const [isLoading, setIsLoading] = useState(false);
  
   // const mapRef = useRef(null);
@@ -37,7 +39,9 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
     if (!serviceType) return false;
     if (serviceType === "Dine-In" && !tableNumber) return false;
     if (!phone) return false;
-    if (serviceType === "Delivery" && !userLocation ||!location) return false;
+  // Require a delivery location only when serviceType is Delivery.
+  // Use parentheses so the check applies only for Delivery (not globally).
+  if (serviceType === "Delivery" && !(userLocation || location)) return false;
     return true;
   };
 
@@ -65,8 +69,10 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
       if (!response.ok) throw new Error("Network response was not ok");
       // const data = await response.json();
       // console.log("Order confirmed:", data);
-      setIsLoading(false);
-      setShowConfirmation(true);
+  setIsLoading(false);
+  // move to success step and show confirmation
+  setStep('success');
+  setShowConfirmation(true);
     } catch (error) {
       console.error("Error confirming order:", error);
     }
@@ -102,7 +108,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
           // For desktop/tablet: slide in from right
           willChange: "transform",
         }}
-        className="absolute  transition-transform duration-300 right-0 top-0 h-full w-full max-w-md bg-white dark:bg-gray-800 shadow-xl"
+        className="absolute transition-transform duration-300 right-0 top-0 h-full w-full max-w-md bg-white dark:bg-gray-800 shadow-xl"
       >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
@@ -120,6 +126,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
             className="flex-1 overflow-y-auto p-6"
             style={{ maxHeight: "calc(100vh - 120px)" }}
           >
+            <OrderProgress step={step} />
             {items.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-500 dark:text-gray-400">
@@ -199,7 +206,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
               {!showOrderDetails ? (
                 <button
                   className="w-full mt-2 py-3 bg-gradient-to-r from-orange-500 to-teal-500 text-white font-bold rounded-xl shadow-lg hover:from-orange-600 hover:to-teal-600 transition-all text-lg"
-                  onClick={() => setShowOrderDetails(true)}
+                  onClick={() => { setShowOrderDetails(true); setStep('payment'); }}
                 >
                   Place Order
                 </button>
@@ -314,7 +321,8 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                     disabled={
                       !serviceType ||
                       (serviceType === "Dine-In" && !tableNumber) ||
-                      !phone
+                      !phone ||
+                      (serviceType === "Delivery" && !(userLocation || location))
                     }
                     onClick={() => handleConfirmOrder()}
                   >

@@ -13,6 +13,8 @@ import { CartProvider } from "./contexts/CartContext";
 import { OrderProvider } from "./contexts/OrderContext";
 import { useLanguage } from "./contexts/LanguageContext";
 import { ClipLoader } from "react-spinners";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import PaymentResultModal from "./components/PaymentResultModal";
 const apiUrl = import.meta.env.VITE_API_BASE_URL;
 export type MenuItemType = {
   _id: string;
@@ -33,9 +35,31 @@ const AppContent: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [menuDataState, setMenuDataState] = useState<MenuItemType[]>([]); // use imported menuData as initial value
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
+  const [categories, setCategories] = useState<string[]>([]);
 
-  const categories = ["Appetizer", "Main Course", "Dessert", "Drink"];
+useEffect(() => {
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/categories`, {
+        method: "GET",
+      });
+      if (!response.ok) throw new Error("Network response was not ok");
+
+      const data = await response.json();
+
+      // Assuming API returns: { data: { categories: [{ name: "Pizza" }, { name: "Burgers" }] } }
+      const categoryNames = data.data?.categories?.map((cat: { name: string }) => cat.name) || [];
+
+      setCategories(categoryNames);
+    } catch (error) {
+      console.error("Error fetching menu data:", error);
+    }
+  };
+
+  fetchCategories();
+}, []);
+
   const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     async function fetchData() {
@@ -66,13 +90,9 @@ const AppContent: React.FC = () => {
         !selectedCategory || item.category === selectedCategory;
       const matchesSearch =
         !searchTerm ||
-        (item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase())) 
-        // item.ingredients[language].some((ingredient) =>
-        //   ingredient.toLowerCase().includes(searchTerm.toLowerCase())
-        // );
-
-      return matchesCategory && matchesSearch;
+        (item.name && item.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.description && item.description?.toLowerCase().includes(searchTerm.toLowerCase()));
+     return matchesCategory && matchesSearch;
     });
   }, [selectedCategory, searchTerm, menuDataState]);
 
@@ -96,9 +116,9 @@ const AppContent: React.FC = () => {
             <ClipLoader color="#ffffff" size={50} />
           </div>
         )}
-        <div className="mt-3 grid-cols-1 lg:grid-cols-4 gap-8">
+  <div className="mt-3 grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content - Menu Items */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             {filteredItems.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-gray-500 dark:text-gray-400 text-lg">
@@ -107,7 +127,7 @@ const AppContent: React.FC = () => {
 
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-4  gap-6">
+              <div className="grid  grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                 {filteredItems.map((item) => (
                   <MenuItem key={item._id} item={item}  />
                 ))}
@@ -124,6 +144,7 @@ const AppContent: React.FC = () => {
       </main>
       <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       <Footer />
+    
     </div>
   );
 };
@@ -138,6 +159,11 @@ function App() {
           </OrderProvider>
         </CartProvider>
       </LanguageProvider>
+      <Router>
+        <Routes>
+          <Route path="/payment/success" element={<PaymentResultModal />} />
+        </Routes>
+      </Router>
     </ThemeProvider>
   );
 }
