@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { X, Plus, Minus, Trash2 } from "lucide-react";
+import { X, Plus, Minus, Trash2, Currency } from "lucide-react";
 import { useCart } from "../contexts/CartContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import DeliveryLocationMap from "./DeliveryLocationMap";
 import OrderProgress from "./OrderProgress";
 const apiUrl = import.meta.env.VITE_API_BASE_URL;
 import { ClipLoader } from "react-spinners";
+
+
 interface CartProps {
   isOpen: boolean;
   onClose: () => void;
@@ -21,9 +23,10 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
 
   const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [step, setStep] = useState<'cart' | 'payment' | 'success'>('cart');
+  const [step, setStep] = useState<"cart" | "payment" | "success">("cart");
   const [isLoading, setIsLoading] = useState(false);
- 
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [totalPrice, setTotalPrice] = useState(0);
   // const mapRef = useRef(null);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
     null
@@ -39,18 +42,18 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
     if (!serviceType) return false;
     if (serviceType === "Dine-In" && !tableNumber) return false;
     if (!phone) return false;
-  // Require a delivery location only when serviceType is Delivery.
-  // Use parentheses so the check applies only for Delivery (not globally).
-  if (serviceType === "Delivery" && !(userLocation || location)) return false;
+    // Require a delivery location only when serviceType is Delivery.
+    // Use parentheses so the check applies only for Delivery (not globally).
+    if (serviceType === "Delivery" && !(userLocation || location)) return false;
     return true;
   };
 
   const handleConfirmOrder = async () => {
+    
     if (!validateOrderDetails()) return;
     // Here you can handle the order confirmation logic, e.g., sending to backend
     const orderDetails = {
       items,
-      // totalPrice:total,
       orderType: serviceType,
       tableNumber,
       phoneNumber: phone,
@@ -67,14 +70,56 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
         body: JSON.stringify(orderDetails),
       });
       if (!response.ok) throw new Error("Network response was not ok");
-      // const data = await response.json();
+      const data = await response.json();
+      const order = data.data?.order;
+      const orderId = order?.orderId;
+      setOrderId(orderId);
+      setTotalPrice(order?.totalPrice);
       // console.log("Order confirmed:", data);
-  setIsLoading(false);
-  // move to success step and show confirmation
-  setStep('success');
-  setShowConfirmation(true);
+      setIsLoading(false);
+      // move to success step and show confirmation
+      setStep("success");
+      setShowConfirmation(true);
+      setShowConfirmation(true);
     } catch (error) {
       console.error("Error confirming order:", error);
+    }
+  };
+
+  const handlePayment = async () => {
+    
+    if (!orderId) return;
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${apiUrl}/payment/initializePayment`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          phone_number: phone,
+          currency: "ETB",
+          orderId,
+          amount: totalPrice,
+        }),
+      });
+      if (!response.ok) throw new Error("Network response was not ok");
+      const data = await response.json();
+      // Handle successful payment here
+      console.log("Payment successful:", data);
+
+      if (data?.data?.data?.checkout_url && data.status === "success") {
+        // checkout_url is an external payment page; use window.location to navigate
+        try {
+          window.location.assign(data.data.data.checkout_url);
+        } catch {
+          window.open(data.data.data.checkout_url, "_blank");
+        }
+      }
+    } catch (error) {
+      console.error("Error processing payment:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -86,7 +131,6 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
           });
-        
         },
         () => {},
         { enableHighAccuracy: true }
@@ -206,7 +250,10 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
               {!showOrderDetails ? (
                 <button
                   className="w-full mt-2 py-3 bg-gradient-to-r from-orange-500 to-teal-500 text-white font-bold rounded-xl shadow-lg hover:from-orange-600 hover:to-teal-600 transition-all text-lg"
-                  onClick={() => { setShowOrderDetails(true); setStep('payment'); }}
+                  onClick={() => {
+                    setShowOrderDetails(true);
+                    setStep("payment");
+                  }}
                 >
                   Place Order
                 </button>
@@ -322,7 +369,8 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                       !serviceType ||
                       (serviceType === "Dine-In" && !tableNumber) ||
                       !phone ||
-                      (serviceType === "Delivery" && !(userLocation || location))
+                      (serviceType === "Delivery" &&
+                        !(userLocation || location))
                     }
                     onClick={() => handleConfirmOrder()}
                   >
@@ -340,10 +388,12 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                           Order Placed!
                         </h2>
                         <p className="mb-6 text-gray-700 dark:text-gray-300">
-                          Your order has been successfully submitted. Thank you!
+                          Your order has been successfully submitted. Please
+                          complete the payment. Thank you! Your Order Id is :{" "}
+                          {orderId ? orderId : ""}
                         </p>
                         <button
-                          className="px-6 py-2 bg-orange-500 text-white rounded-lg font-semibold shadow hover:bg-orange-600 transition-all"
+                          className="px-6 mr-2 py-2 bg-orange-500 text-white rounded-lg font-semibold shadow hover:bg-orange-600 transition-all"
                           onClick={() => {
                             setShowConfirmation(false);
                             setShowOrderDetails(false);
@@ -352,6 +402,16 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                           }}
                         >
                           Close
+                        </button>
+                        <button
+                          className="px-6 py-2 hover:bg-orange-600  bg-teal-600 text-white rounded-lg font-semibold shadow hover:bg-teal-700 transition-all"
+                          style={{
+                            background: "#4CAF50",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handlePayment()}
+                        >
+                          Pay
                         </button>
                       </div>
                     </div>

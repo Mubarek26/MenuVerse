@@ -5,6 +5,7 @@ interface OrderContextType {
   serviceType: ServiceType | null;
   tableNumber: string;
   phoneNumber: string;
+  orderId: string;
   setServiceType: (type: ServiceType) => void;
   setTableNumber: (number: string) => void;
   setPhoneNumber: (number: string) => void;
@@ -25,11 +26,13 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [serviceType, setServiceType] = useState<ServiceType | null>(null);
   const [tableNumber, setTableNumber] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [orderId, setOrderId] = useState('');
 
   const resetOrder = () => {
     setServiceType(null);
     setTableNumber('');
     setPhoneNumber('');
+    setOrderId('');
   };
 
   return (
@@ -40,7 +43,8 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setServiceType,
       setTableNumber,
       setPhoneNumber,
-      resetOrder
+      resetOrder,
+      orderId
     }}>
       {children}
     </OrderContext.Provider>
