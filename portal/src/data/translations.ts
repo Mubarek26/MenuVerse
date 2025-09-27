@@ -1,7 +1,7 @@
 export const translations = {
   en: {
     // Header
-    appTitle: 'Digital Menu',
+    appTitle: 'Menuverse',
     lightMode: 'Light Mode',
     darkMode: 'Dark Mode',
     

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Moon, Globe, ShoppingCart } from 'lucide-react';
+import { Sun, Moon, Globe, ShoppingCart, Search } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useCart } from '../contexts/CartContext';
@@ -20,15 +20,24 @@ const Header: React.FC<HeaderProps> = ({ onCartToggle }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-teal-500 to-orange-500 rounded-lg flex items-center justify-center">
+            {/* <div className="w-8 h-8 bg-gradient-to-r from-teal-500 to-orange-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">M</span>
-            </div>
+            </div> */}
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">
               {t('appTitle')}
             </h1>
           </div>
 
           <div className="flex items-center space-x-4">
+            {/*check order status*/}
+            <button
+              aria-label="Check order status"
+              onClick={() => window.dispatchEvent(new Event("openCheckOrderModal"))}
+              className="p-2 rounded-lg bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 transition-colors"
+              title="Check order status"
+            >
+              <Search className="w-5 h-5 text-teal-600" />
+            </button>
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"

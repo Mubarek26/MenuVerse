@@ -7,7 +7,6 @@ import OrderProgress from "./OrderProgress";
 const apiUrl = import.meta.env.VITE_API_BASE_URL;
 import { ClipLoader } from "react-spinners";
 
-
 interface CartProps {
   isOpen: boolean;
   onClose: () => void;
@@ -49,7 +48,6 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
   };
 
   const handleConfirmOrder = async () => {
-    
     if (!validateOrderDetails()) return;
     // Here you can handle the order confirmation logic, e.g., sending to backend
     const orderDetails = {
@@ -80,14 +78,13 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
       // move to success step and show confirmation
       setStep("success");
       setShowConfirmation(true);
-      setShowConfirmation(true);
+      // setShowConfirmation(true);
     } catch (error) {
       console.error("Error confirming order:", error);
     }
   };
 
   const handlePayment = async () => {
-    
     if (!orderId) return;
     setIsLoading(true);
     try {
@@ -411,7 +408,14 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                           }}
                           onClick={() => handlePayment()}
                         >
-                          Pay
+                          {isLoading ? (
+                            <>
+                              <span className="loader animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4"></span>
+                              Processing...
+                            </>
+                          ) : (
+                            "Pay"
+                          )}
                         </button>
                       </div>
                     </div>

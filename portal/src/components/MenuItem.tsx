@@ -10,6 +10,7 @@ interface MenuItemProps {
 const MenuItem: React.FC<MenuItemProps> = ({ item }) => {
   const { addToCart } = useCart();
   const [isAdding, setIsAdding] = useState(false);
+  // check modal is handled at app level; dispatch events from this item
   const imgRef = useRef<HTMLImageElement | null>(null);
 
   const handleAddToCart = () => {
@@ -90,6 +91,8 @@ const MenuItem: React.FC<MenuItemProps> = ({ item }) => {
     }, 650);
   };
 
+  // check modal is handled at app level; dispatch events from this item
+
   return (
     <>
       {/* Small-screen compact card - visible below lg */}
@@ -138,7 +141,8 @@ const MenuItem: React.FC<MenuItemProps> = ({ item }) => {
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-teal-600 text-white text-sm font-semibold shadow-sm">
               {item.price} ETB
             </div>
-            <button
+            <div className="flex items-center gap-2">
+              <button
               onClick={handleAddToCart}
               disabled={!item.isAvailable || isAdding}
               aria-label={`Add ${item.name} to cart`}
@@ -154,9 +158,12 @@ const MenuItem: React.FC<MenuItemProps> = ({ item }) => {
                 <Plus className="w-5 h-5" />
               )}
             </button>
+            </div>
           </div>
         </div>
       </article>
+
+  {/* check modal is handled at app level; dispatch events from this item */}
 
       {/* Large-screen top-image card - visible at lg+ only */}
       <article className="hidden lg:block relative bg-white dark:bg-gray-900 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 font-sans overflow-hidden transition-transform hover:scale-102">

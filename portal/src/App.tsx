@@ -15,6 +15,7 @@ import { useLanguage } from "./contexts/LanguageContext";
 import { ClipLoader } from "react-spinners";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import PaymentResultModal from "./components/PaymentResultModal";
+import CheckOrderModal from "./components/CheckOrderModal";
 const apiUrl = import.meta.env.VITE_API_BASE_URL;
 export type MenuItemType = {
   _id: string;
@@ -156,6 +157,7 @@ function App() {
         <CartProvider>
           <OrderProvider>
             <AppContent />
+            <CheckOrderModal />
           </OrderProvider>
         </CartProvider>
       </LanguageProvider>
