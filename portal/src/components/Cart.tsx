@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { X, Plus, Minus, Trash2, Currency } from "lucide-react";
+import { X, Plus, Minus, Trash2 } from "lucide-react";
 import { useCart } from "../contexts/CartContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import DeliveryLocationMap from "./DeliveryLocationMap";
 import OrderProgress from "./OrderProgress";
 const apiUrl = import.meta.env.VITE_API_BASE_URL;
 import { ClipLoader } from "react-spinners";
+import { del } from "framer-motion/client";
+// ...existing imports...
 
 interface CartProps {
   isOpen: boolean;
@@ -35,6 +37,12 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
     lng: number;
   } | null>(null);
   const [specialInstructions, setSpecialInstructions] = useState("");
+  const [specialNotice, setSpecialNotice] = useState("");
+  const [dineInEnabled, setDineInEnabled] = useState(true);
+  const [takeawayEnabled, setTakeawayEnabled] = useState(true);
+  const [deliveryEnabled, setDeliveryEnabled] = useState(true);
+
+  // ...existing code...
 
   // Validate order details before confirming
   const validateOrderDetails = () => {
@@ -47,6 +55,46 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
     return true;
   };
 
+
+  useEffect(() => {
+    // fetch the settings from backend once
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/settings`);
+        if (response.ok) {
+          const data = await response.json();
+          const settings = data.data?.settings;
+          // fix key name: schema uses `dine_in`
+          const dineInFlag = settings?.services?.dine_in ?? true;
+          const takeawayFlag = settings?.services?.takeaway ?? true;
+          const deliveryFlag = settings?.services?.delivery ?? true;
+          setDineInEnabled(dineInFlag);
+          setTakeawayEnabled(takeawayFlag);
+          setDeliveryEnabled(deliveryFlag);
+          // set special notice for display to customers
+          if (settings?.special_notice) {
+            setSpecialNotice(settings.special_notice);
+          } else {
+            setSpecialNotice('');
+          }
+          console.log("Fetched settings:", settings);
+
+          // If the currently selected serviceType is not available, pick the first available
+          const allowed: string[] = [];
+          if (dineInFlag) allowed.push("Dine-In");
+          if (takeawayFlag) allowed.push("Takeaway");
+          if (deliveryFlag) allowed.push("Delivery");
+          if (allowed.length > 0 && !allowed.includes(serviceType)) {
+            setServiceType(allowed[0]);
+          }
+        }
+      } catch (err) {
+        console.error('Failed fetching settings', err);
+      }
+    };
+
+    fetchSettings();
+  }, []);
   const handleConfirmOrder = async () => {
     if (!validateOrderDetails()) return;
     // Here you can handle the order confirmation logic, e.g., sending to backend
@@ -163,6 +211,19 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
               <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             </button>
           </div>
+          {specialNotice ? (
+            <div className="px-6 py-3 bg-yellow-50 dark:bg-yellow-900 border-t border-b border-yellow-100 dark:border-yellow-800 text-sm">
+              <div className="flex items-start justify-between">
+                <div className="text-yellow-800 dark:text-yellow-100">{specialNotice}</div>
+                <button
+                  onClick={() => setSpecialNotice("")}
+                  className="ml-4 text-yellow-800 dark:text-yellow-200 font-semibold"
+                >
+                  {/* × */}
+                </button>
+              </div>
+            </div>
+          ) : null}
           <div
             className="flex-1 overflow-y-auto p-6"
             style={{ maxHeight: "calc(100vh - 120px)" }}
@@ -184,7 +245,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                     <div className="flex items-center space-x-4">
                       <img
                         src={item.menuItem.imageUrl}
-                        alt={item.menuItem.name[language]}
+                        alt={(item.menuItem.name as any)[language]}
                         className="w-16 h-16 object-cover rounded-lg"
                       />
                       <div className="flex-1 min-w-0">
@@ -274,21 +335,78 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
             >
               <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             </button> */}
-                  <div className="flex gap-3 mb-4 justify-start">
-                    {["Dine-In", "Takeaway", "Delivery"].map((type) => (
-                      <button
-                        key={type}
-                        className={`px-3 py-1 rounded-full font-semibold border transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 text-base ${
-                          serviceType === type
-                            ? "bg-gradient-to-r from-orange-500 to-teal-500 text-white border-orange-500 scale-105"
-                            : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                        }`}
-                        onClick={() => setServiceType(type)}
-                      >
-                        {type}
-                      </button>
-                    ))}
+                  <div className="flex gap-3 mb-2 justify-start">
+                    {(["Dine-In", "Takeaway", "Delivery"] as string[]).map(
+                      (type) => {
+                        const enabled =
+                          type === "Dine-In"
+                            ? dineInEnabled
+                            : type === "Takeaway"
+                            ? takeawayEnabled
+                            : deliveryEnabled;
+                        const isActive = serviceType === type;
+                        return (
+                          <button
+                            key={type}
+                            onClick={() => enabled && setServiceType(type)}
+                            disabled={!enabled}
+                            title={!enabled ? `${type} is currently unavailable` : type}
+                            className={`px-3 py-1 rounded-full font-semibold border transition-all duration-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 text-base flex items-center gap-2 ${
+                              isActive
+                                ? "bg-gradient-to-r from-orange-500 to-teal-500 text-white border-orange-500 scale-105"
+                                : enabled
+                                ? "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                : "bg-gray-100/40 dark:bg-gray-800/40 text-gray-400 dark:text-gray-500 border-gray-200 cursor-not-allowed"
+                            }`}
+                          >
+                            <span className="text-sm">{type}</span>
+                            {!enabled && (
+                              <svg
+                                className="w-4 h-4 text-gray-500"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d="M12 9v4"
+                                  stroke="currentColor"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                                <path
+                                  d="M12 17h.01"
+                                  stroke="currentColor"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            )}
+                          </button>
+                        );
+                      }
+                    )}
                   </div>
+
+                  {/* Show brief info when any services are unavailable */}
+                  {(!dineInEnabled || !takeawayEnabled || !deliveryEnabled) && (
+                    <div className="mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300">
+                      <strong className="block text-gray-800 dark:text-gray-100 mb-1">Service availability</strong>
+                      <ul className="list-disc list-inside space-y-1">
+                        {!dineInEnabled && (
+                          <li>Dine-In is currently unavailable.</li>
+                        )}
+                        {!takeawayEnabled && (
+                          <li>Takeaway is currently unavailable.</li>
+                        )}
+                        {!deliveryEnabled && (
+                          <li>Delivery is currently unavailable.</li>
+                        )}
+                      </ul>
+                      <p className="mt-2 text-xs text-gray-400">If you need assistance, please contact the restaurant.</p>
+                    </div>
+                  )}
                   <div className="mb-4">
                     <label className="block mb-2 font-medium text-gray-700 dark:text-gray-200">
                       Table Number
