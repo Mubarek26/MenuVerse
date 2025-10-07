@@ -50,35 +50,45 @@ const Header: React.FC<HeaderProps> = ({ onCartToggle }) => {
     <header className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
       {specialNotice ? (
         <div className="px-4 py-3">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center gap-4 bg-gradient-to-r from-yellow-400 to-orange-300 dark:from-yellow-700 dark:to-orange-600 text-yellow-900 dark:text-yellow-50 rounded-xl shadow-md p-3 animate-slide-down">
-              <div className="flex-shrink-0">
-                <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z" fill="rgba(255,255,255,0.2)" />
-                  <path d="M12 22V12" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <div className="flex-1 text-sm font-medium leading-tight text-white dark:text-white" style={{ textShadow: '0 1px 0 rgba(0,0,0,0.15)' }}>
-                <div dangerouslySetInnerHTML={{ __html: renderMarkdown(specialNotice) }} />
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => window.open('/help', '_blank')}
-                  className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-md text-sm text-white"
-                >
-                  Learn more
-                </button>
-                <button
-                  onClick={() => setSpecialNotice(null)}
-                  className="p-1 rounded-md bg-white/10 hover:bg-white/20 text-white"
-                  aria-label="Dismiss notice"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+  <div className="max-w-7xl mx-auto">
+    <div className="flex items-start sm:items-center justify-between gap-3 sm:gap-4 bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-500 dark:from-orange-700 dark:via-yellow-600 dark:to-amber-700 text-yellow-900 dark:text-yellow-50 rounded-2xl shadow-lg p-4 sm:p-5 animate-slide-down relative overflow-hidden">
+      
+      {/* Decorative Glow */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-30 pointer-events-none rounded-2xl" />
+
+      {/* Icon */}
+      <div className="flex-shrink-0 relative z-10">
+        <svg className="w-8 h-8 text-white drop-shadow-md" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" fill="rgba(255,255,255,0.3)" />
+          <path d="M12 22V12" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </div>
+
+      {/* Text */}
+      <div className="flex-1 text-[15px] sm:text-sm font-medium leading-snug text-white dark:text-white relative z-10">
+        <div dangerouslySetInnerHTML={{ __html: renderMarkdown(specialNotice) }} />
+      </div>
+
+      {/* Buttons */}
+      <div className="flex items-center gap-2 sm:gap-3 relative z-10">
+        <button
+          onClick={() => window.open('/help', '_blank')}
+          className="px-3 py-1.5 bg-white/20 hover:bg-white/30 transition-all rounded-md text-sm text-white backdrop-blur-sm shadow-sm"
+        >
+          Learn more
+        </button>
+        <button
+          onClick={() => setSpecialNotice(null)}
+          className="p-1.5 rounded-md bg-white/10 hover:bg-white/25 text-white text-lg leading-none"
+          aria-label="Dismiss notice"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
       ) : null}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
